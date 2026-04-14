@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cosense Stream TL</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <aside id="sidebar">
+    <h1>Cosense TL</h1>
+    <form id="add-form">
+      <input
+        type="text"
+        id="project-input"
+        placeholder="Project IDを追加"
+        autocomplete="off"
+        spellcheck="false"
+      >
+      <button type="submit">+</button>
+    </form>
+    <ul id="project-list"></ul>
+    <button id="reload-btn" disabled>更新</button>
+  </aside>
+
+  <main>
+    <div id="status"></div>
+    <div id="timeline"></div>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>
