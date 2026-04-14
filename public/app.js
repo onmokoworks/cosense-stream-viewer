@@ -8,6 +8,7 @@ const COLORS = [
 // ── State ──
 
 let projects = loadProjects(); // [{ id, color }]
+let autoTimer = null;
 
 // ── DOM ──
 
@@ -17,6 +18,8 @@ const listEl = document.getElementById("project-list");
 const reloadBtn = document.getElementById("reload-btn");
 const statusEl = document.getElementById("status");
 const timelineEl = document.getElementById("timeline");
+const autoToggle = document.getElementById("auto-toggle");
+const autoInterval = document.getElementById("auto-interval");
 
 // ── Init ──
 
@@ -46,6 +49,38 @@ addForm.addEventListener("submit", (e) => {
 });
 
 reloadBtn.addEventListener("click", () => reloadAll());
+
+// ── Auto refresh ──
+
+autoToggle.addEventListener("change", () => {
+  if (autoToggle.checked) {
+    startAutoRefresh();
+  } else {
+    stopAutoRefresh();
+  }
+});
+
+autoInterval.addEventListener("change", () => {
+  if (autoToggle.checked) {
+    stopAutoRefresh();
+    startAutoRefresh();
+  }
+});
+
+function startAutoRefresh() {
+  stopAutoRefresh();
+  const sec = parseInt(autoInterval.value, 10) || 60;
+  autoTimer = setInterval(() => {
+    if (projects.length > 0) reloadAll();
+  }, sec * 1000);
+}
+
+function stopAutoRefresh() {
+  if (autoTimer) {
+    clearInterval(autoTimer);
+    autoTimer = null;
+  }
+}
 
 // ── Projects persistence ──
 

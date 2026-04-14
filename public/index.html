@@ -20,6 +20,18 @@
       <button type="submit">+</button>
     </form>
     <ul id="project-list"></ul>
+    <div id="auto-refresh">
+      <label>
+        <input type="checkbox" id="auto-toggle">
+        自動更新
+      </label>
+      <select id="auto-interval">
+        <option value="30">30秒</option>
+        <option value="60" selected>1分</option>
+        <option value="180">3分</option>
+        <option value="300">5分</option>
+      </select>
+    </div>
     <button id="reload-btn" disabled>更新</button>
   </aside>
 
