@@ -259,23 +259,27 @@ function renderTimeline(items) {
     title.textContent = page.title;
     body.appendChild(title);
 
+    const SESSION_WINDOW_SEC = 30 * 60;
     const contentLines = page.lines
       .slice(1)
-      .filter((l) => l.text.trim() !== "");
+      .filter(
+        (l) =>
+          l.text.trim() !== "" && updatedAt - l.updated <= SESSION_WINDOW_SEC
+      );
     if (contentLines.length > 0) {
       const linesDiv = document.createElement("div");
       linesDiv.className = "card-lines";
-      const shown = contentLines.slice(0, 5);
+      const shown = contentLines.slice(0, 8);
       for (const line of shown) {
         const lineEl = document.createElement("div");
         lineEl.className = "card-line";
         lineEl.innerHTML = formatLine(line.text);
         linesDiv.appendChild(lineEl);
       }
-      if (contentLines.length > 5) {
+      if (contentLines.length > 8) {
         const more = document.createElement("div");
         more.className = "card-line card-more";
-        more.textContent = `… 他 ${contentLines.length - 5} 行`;
+        more.textContent = `… 他 ${contentLines.length - 8} 行`;
         linesDiv.appendChild(more);
       }
       body.appendChild(linesDiv);
