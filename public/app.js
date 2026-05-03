@@ -1,4 +1,5 @@
 const STORAGE_KEY = "cosense-tl-projects";
+const SIDEBAR_KEY = "cosense-tl-sidebar-collapsed";
 
 const COLORS = [
   "#4a9", "#e67", "#59d", "#e94", "#8b5cf6",
@@ -20,6 +21,18 @@ const statusEl = document.getElementById("status");
 const timelineEl = document.getElementById("timeline");
 const autoToggle = document.getElementById("auto-toggle");
 const autoInterval = document.getElementById("auto-interval");
+const sidebarToggle = document.getElementById("sidebar-toggle");
+
+// ── Sidebar collapse ──
+
+if (localStorage.getItem(SIDEBAR_KEY) === "1") {
+  document.body.classList.add("sidebar-collapsed");
+}
+
+sidebarToggle.addEventListener("click", () => {
+  const collapsed = document.body.classList.toggle("sidebar-collapsed");
+  localStorage.setItem(SIDEBAR_KEY, collapsed ? "1" : "0");
+});
 
 // ── Init ──
 
