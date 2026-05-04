@@ -22,6 +22,12 @@ const timelineEl = document.getElementById("timeline");
 const autoToggle = document.getElementById("auto-toggle");
 const autoInterval = document.getElementById("auto-interval");
 const sidebarToggle = document.getElementById("sidebar-toggle");
+const settingsToggle = document.getElementById("settings-toggle");
+const settingsPanel = document.getElementById("settings-panel");
+const bulkIds = document.getElementById("bulk-ids");
+const bulkCopy = document.getElementById("bulk-copy");
+const bulkApply = document.getElementById("bulk-apply");
+const bulkStatus = document.getElementById("bulk-status");
 
 // ── Sidebar collapse ──
 
@@ -33,6 +39,65 @@ sidebarToggle.addEventListener("click", () => {
   const collapsed = document.body.classList.toggle("sidebar-collapsed");
   localStorage.setItem(SIDEBAR_KEY, collapsed ? "1" : "0");
 });
+
+// ── Bulk edit panel ──
+
+settingsToggle.addEventListener("click", () => {
+  const willOpen = !settingsPanel.classList.contains("open");
+  settingsPanel.classList.toggle("open", willOpen);
+  settingsToggle.setAttribute("aria-expanded", String(willOpen));
+  if (willOpen) {
+    bulkIds.value = projects.map((p) => p.id).join("\n");
+    bulkStatus.textContent = "";
+    bulkStatus.className = "";
+  }
+});
+
+bulkCopy.addEventListener("click", async () => {
+  const text = projects.map((p) => p.id).join("\n");
+  try {
+    await navigator.clipboard.writeText(text);
+    flashStatus(`${projects.length} 件コピー`);
+  } catch {
+    bulkIds.value = text;
+    bulkIds.select();
+    flashStatus("クリップボード不可、選択しました", true);
+  }
+});
+
+bulkApply.addEventListener("click", () => {
+  const ids = bulkIds.value
+    .split(/\r?\n/)
+    .map((s) => s.trim())
+    .filter((s) => s !== "");
+  const seen = new Set();
+  const unique = [];
+  for (const id of ids) {
+    if (id.includes("/")) continue;
+    if (seen.has(id)) continue;
+    seen.add(id);
+    unique.push(id);
+  }
+  const existing = new Map(projects.map((p) => [p.id, p.color]));
+  projects = unique.map((id, i) => ({
+    id,
+    color: existing.get(id) || COLORS[i % COLORS.length],
+  }));
+  saveProjects();
+  renderProjectList();
+  flashStatus(`${projects.length} 件で置換`);
+  if (projects.length > 0) {
+    reloadAll();
+  } else {
+    timelineEl.innerHTML = "";
+    statusEl.textContent = "サイドバーからプロジェクトIDを追加してください";
+  }
+});
+
+function flashStatus(msg, isError = false) {
+  bulkStatus.textContent = msg;
+  bulkStatus.className = isError ? "error" : "";
+}
 
 // ── Init ──
 
