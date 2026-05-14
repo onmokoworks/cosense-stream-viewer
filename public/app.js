@@ -29,6 +29,7 @@ const bulkCopy = document.getElementById("bulk-copy");
 const bulkApply = document.getElementById("bulk-apply");
 const bulkStatus = document.getElementById("bulk-status");
 
+
 // ── Sidebar collapse ──
 
 if (localStorage.getItem(SIDEBAR_KEY) === "1") {
@@ -66,9 +67,10 @@ bulkCopy.addEventListener("click", async () => {
 });
 
 bulkApply.addEventListener("click", () => {
-  const ids = bulkIds.value
+  const raw = bulkIds.value;
+  const ids = raw
     .split(/\r?\n/)
-    .map((s) => s.trim())
+    .map((s) => normalizeId(s))
     .filter((s) => s !== "");
   const seen = new Set();
   const unique = [];
@@ -77,6 +79,9 @@ bulkApply.addEventListener("click", () => {
     if (seen.has(id)) continue;
     seen.add(id);
     unique.push(id);
+  }
+  if (unique.length > 0) {
+    bulkIds.value = unique.join("\n");
   }
   const existing = new Map(projects.map((p) => [p.id, p.color]));
   projects = unique.map((id, i) => ({
@@ -99,6 +104,19 @@ function flashStatus(msg, isError = false) {
   bulkStatus.className = isError ? "error" : "";
 }
 
+function normalizeId(text) {
+  let t = text.trim();
+  let prev;
+  do {
+    prev = t;
+    if (t.startsWith("/")) t = t.slice(1);
+    if (t.startsWith("[") && t.endsWith("]") && t.length >= 2) {
+      t = t.slice(1, -1);
+    }
+  } while (t !== prev);
+  return t;
+}
+
 // ── Init ──
 
 renderProjectList();
@@ -112,7 +130,7 @@ if (projects.length > 0) {
 
 addForm.addEventListener("submit", (e) => {
   e.preventDefault();
-  const id = input.value.trim();
+  const id = normalizeId(input.value);
   if (!id) return;
   if (projects.some((p) => p.id === id)) {
     input.value = "";
